@@ -1,4 +1,5 @@
 import { Plugin, Notice } from "obsidian";
+import { getClipboardText } from "../utils/clipboard";
 
 
 const AVG_CHAR_WIDTH = 10;
@@ -117,15 +118,6 @@ function calculateNodeWidth(text: string): number {
     const maxLineLength = Math.max(...lines.map(line => line.length));
 
     return (maxLineLength * AVG_CHAR_WIDTH) + PADDING;
-}
-async function getClipboardText(): Promise<string> {
-    try {
-        const text = await navigator.clipboard.readText();
-        return text;
-    } catch (err) {
-        console.error('Failed to read clipboard contents: ', err);
-        return '';
-    }
 }
 
 async function createCanvasFromClipboard(plugin: Plugin) {
