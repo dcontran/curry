@@ -12,6 +12,7 @@ import {
 import { createCanvasFromClipboard } from './commands/canvasFromDebug';
 import { formatIssueCheckout } from './commands/formatIssue';
 import { formatAsTodoList } from './commands/formatAsTodoList';
+import { formatAsPackages } from './commands/formatAsPackages';
 
 export default class CurryPlugin extends Plugin {
 	settings!: MyPluginSettings;
@@ -67,15 +68,26 @@ export default class CurryPlugin extends Plugin {
 		});
 
 		this.addCommand({
-			id: 'format-packages-todo-list',
+			id: 'format-packages-as-todo-list',
 			name: 'Format packages as todo list',
 			editorCallback: async () => {
 				await formatAsTodoList(this);
 			},
 		});
+
+		this.addCommand({
+			id: 'format-todo-list-as-packages',
+			name: 'Format todo list as packages',
+			editorCallback: async (editor: Editor) => {
+				await formatAsPackages(editor);
+			},
+		});
+
 	}
 
 	private addMenus() {
+
+
 		this.registerEvent(
 			this.app.workspace.on(
 				"editor-menu",
@@ -86,6 +98,27 @@ export default class CurryPlugin extends Plugin {
 							.setIcon("list-todo")
 							.onClick(async () => {
 								await formatAsTodoList(this);
+							});
+					});
+				}
+			)
+		);
+
+		this.registerEvent(
+			this.app.workspace.on(
+				"editor-menu",
+				(menu, editor, view) => {
+
+					if (!editor.getSelection().trim()) {
+						return;
+					}
+
+					menu.addItem((item) => {
+						item
+							.setTitle("Todo list → Packages")
+							.setIcon("list")
+							.onClick(async () => {
+								await formatAsPackages(editor);
 							});
 					});
 				}
