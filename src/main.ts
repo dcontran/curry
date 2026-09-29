@@ -11,6 +11,7 @@ import {
 } from './settings';
 import { createCanvasFromClipboard } from './commands/canvasFromDebug';
 import { formatIssueCheckout } from './commands/formatIssue';
+import { formatAsTodoList } from './commands/formatAsTodoList';
 
 export default class CurryPlugin extends Plugin {
 	settings!: MyPluginSettings;
@@ -41,6 +42,31 @@ export default class CurryPlugin extends Plugin {
 				await formatIssueCheckout(this)
 			},
 		});
+
+		this.addCommand({
+			id: 'format-packages-todo-list',
+			name: 'Format packages as todo list',
+			editorCallback: async () => {
+				await formatAsTodoList(this);
+			},
+		});
+
+		this.registerEvent(
+			this.app.workspace.on(
+				"editor-menu",
+				(menu, editor, view) => {
+					menu.addItem((item) => {
+						item
+							.setTitle("Format packages as todo list")
+							.setIcon("list-todo")
+							.onClick(async () => {
+								await formatAsTodoList(this);
+							});
+					});
+				}
+			)
+		);
+
 
 		// This adds a settings tab so the user can configure various aspects of the plugin
 		this.addSettingTab(new SampleSettingTab(this.app, this));
