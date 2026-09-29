@@ -69,7 +69,7 @@ export default class CurryPlugin extends Plugin {
 
 		this.addCommand({
 			id: 'format-packages-as-todo-list',
-			name: 'Format packages as todo list',
+			name: 'Paste packages list -> Todo list',
 			editorCallback: async () => {
 				await formatAsTodoList(this);
 			},
@@ -77,7 +77,7 @@ export default class CurryPlugin extends Plugin {
 
 		this.addCommand({
 			id: 'format-todo-list-as-packages',
-			name: 'Format todo list as packages',
+			name: 'Copy Todo list → Packages',
 			editorCallback: async (editor: Editor) => {
 				await formatAsPackages(editor);
 			},
@@ -94,7 +94,7 @@ export default class CurryPlugin extends Plugin {
 				(menu, editor, view) => {
 					menu.addItem((item) => {
 						item
-							.setTitle("Format packages as todo list")
+							.setTitle("Paste packages list -> Todo list")
 							.setIcon("list-todo")
 							.onClick(async () => {
 								await formatAsTodoList(this);
@@ -115,7 +115,7 @@ export default class CurryPlugin extends Plugin {
 
 					menu.addItem((item) => {
 						item
-							.setTitle("Todo list → Packages")
+							.setTitle("Copy Todo list → Packages")
 							.setIcon("list")
 							.onClick(async () => {
 								await formatAsPackages(editor);
