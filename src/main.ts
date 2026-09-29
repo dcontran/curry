@@ -26,7 +26,30 @@ export default class CurryPlugin extends Plugin {
 			await createCanvasFromClipboard(this)
 		});
 
-		// This adds an editor command that can perform some operation on the current editor instance
+		this.addCommands()
+		this.addMenus()
+
+
+		// This adds a settings tab so the user can configure various aspects of the plugin
+		this.addSettingTab(new SampleSettingTab(this.app, this));
+
+	}
+
+	onunload() { }
+
+	async loadSettings() {
+		this.settings = Object.assign(
+			{},
+			DEFAULT_SETTINGS,
+			(await this.loadData()) as Partial<MyPluginSettings>,
+		);
+	}
+
+	async saveSettings() {
+		await this.saveData(this.settings);
+	}
+
+	private addCommands() {
 		this.addCommand({
 			id: 'canvas-from-debug',
 			name: 'Canvas from debug',
@@ -50,7 +73,9 @@ export default class CurryPlugin extends Plugin {
 				await formatAsTodoList(this);
 			},
 		});
+	}
 
+	private addMenus() {
 		this.registerEvent(
 			this.app.workspace.on(
 				"editor-menu",
@@ -66,25 +91,6 @@ export default class CurryPlugin extends Plugin {
 				}
 			)
 		);
-
-
-		// This adds a settings tab so the user can configure various aspects of the plugin
-		this.addSettingTab(new SampleSettingTab(this.app, this));
-
-	}
-
-	onunload() { }
-
-	async loadSettings() {
-		this.settings = Object.assign(
-			{},
-			DEFAULT_SETTINGS,
-			(await this.loadData()) as Partial<MyPluginSettings>,
-		);
-	}
-
-	async saveSettings() {
-		await this.saveData(this.settings);
 	}
 }
 
