@@ -13,24 +13,26 @@ export async function formatAsTodoList(plugin: Plugin) {
             const cleanPath = path.split("@@")[0];
 
             if (!cleanPath) {
-                new Notice("Error")
-                return
-            }
-
-            const match = cleanPath.match(/^\.\/([^/]+)\/(.+)$/);
-
-            if (!match) {
                 return;
             }
 
-            const [, module, file] = match;
+            const parts = cleanPath.split("/");
 
-            if (!module) {
-                new Notice("Error module")
-                return
+            const packageIndex = parts.findIndex(part =>
+                part.endsWith(".adb") ||
+                part.endsWith(".ads") ||
+                part.endsWith(".sh") ||
+                part.endsWith(".gpr")
+            );
+
+            if (packageIndex <= 0) {
+                return;
             }
-            if (!file) {
-                new Notice("Error file")
+
+            const module = parts[packageIndex - 1];
+            const pkg = parts[packageIndex];
+
+            if (!module || !pkg) {
                 return
             }
 
@@ -38,7 +40,7 @@ export async function formatAsTodoList(plugin: Plugin) {
                 modules.set(module, []);
             }
 
-            modules.get(module)!.push(file);
+            modules.get(module)!.push(pkg);
         });
 
     let output = "";
