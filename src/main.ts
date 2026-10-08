@@ -3,6 +3,8 @@ import {
 	MarkdownView,
 	MarkdownFileInfo,
 	Plugin,
+	Notice,
+	setIcon,
 } from 'obsidian';
 import {
 	DEFAULT_SETTINGS,
@@ -18,7 +20,67 @@ export default class CurryPlugin extends Plugin {
 	settings!: MyPluginSettings;
 
 	async onload() {
+		console.log("Curry loaded")
 		await this.loadSettings();
+
+		// Initial scan
+		this.addBaseCopyButtons();
+
+		const observer = new MutationObserver(() => {
+			this.addBaseCopyButtons();
+		});
+
+		observer.observe(document.body, {
+			childList: true,
+			subtree: true,
+		});
+
+		this.register(() => observer.disconnect());
+
+		this.registerInterval(
+			window.setInterval(() => this.addCopyButtons(), 1000)
+		);
+
+		this.registerMarkdownPostProcessor((element) => {
+			const properties = element.querySelectorAll(".metadata-property");
+
+			properties.forEach((property) => {
+				const key =
+					property.querySelector(".metadata-property-key")
+						?.textContent;
+
+				console.log("no")
+
+				if (key !== "Comando") return;
+				console.log("Ok")
+
+				const valueElement = property.querySelector(
+					".metadata-property-value"
+				);
+
+				if (!valueElement) return;
+
+				// Avoid adding the button twice
+				if (valueElement.querySelector(".copy-command-button"))
+					return;
+
+				const value =
+					valueElement.textContent?.trim() ?? "";
+
+				const button = document.createElement("span");
+				button.className = "copy-command-button";
+				button.textContent = "📋";
+				button.style.cursor = "pointer";
+				button.style.marginLeft = "8px";
+
+				button.onclick = async () => {
+					await navigator.clipboard.writeText(value);
+					new Notice("Command copied");
+				};
+
+				valueElement.appendChild(button);
+			});
+		});
 
 		// This creates an icon in the left ribbon.
 		this.addRibbonIcon('dice', 'Create canvas from debug', async (_evt: MouseEvent) => {
@@ -48,6 +110,73 @@ export default class CurryPlugin extends Plugin {
 
 	async saveSettings() {
 		await this.saveData(this.settings);
+	}
+	private addBaseCopyButtons() {
+		const cells = document.querySelectorAll(
+			'.bases-td[data-property="note.Comando"]'
+		);
+
+		cells.forEach((cell) => {
+			if (cell.querySelector(".copy-command-btn")) return;
+
+			const valueElement = cell.querySelector(
+				".metadata-input-longtext"
+			);
+
+			if (!valueElement) return;
+
+			const button = document.createElement("span");
+			button.className = "copy-command-btn";
+
+			setIcon(button, "clipboard-copy");
+
+			button.onclick = async (e) => {
+				e.stopPropagation();
+
+				const value = valueElement.textContent?.trim() ?? "";
+
+				await navigator.clipboard.writeText(value);
+				new Notice(`Copied: ${value}`);
+			};
+
+			cell.appendChild(button);
+		});
+	}
+	private addCopyButtons() {
+		const properties = document.querySelectorAll(
+			'.metadata-property[data-property-key="comando"]'
+		);
+
+		properties.forEach((property) => {
+			const valueContainer = property.querySelector(
+				".metadata-property-value"
+			);
+
+			if (!valueContainer) return;
+
+			// Already added?
+			if (valueContainer.querySelector(".copy-command-btn")) return;
+
+			const button = document.createElement("span");
+			button.className = "copy-command-btn";
+
+			setIcon(button, "clipboard-copy");
+
+			button.onclick = async (event) => {
+				event.stopPropagation();
+
+				const value = property
+					.querySelector(".metadata-input-longtext")
+					?.textContent?.trim();
+
+				if (!value) return;
+
+				await navigator.clipboard.writeText(value);
+				new Notice("Command copied");
+			};
+
+			valueContainer.appendChild(button);
+		});
 	}
 
 	private addCommands() {
