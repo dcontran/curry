@@ -1,5 +1,5 @@
 import { Plugin, Notice } from "obsidian";
-import { getClipboardText } from "../utils/clipboard";
+import { getClipboardText, isGdbBacktrace } from "../utils/clipboard";
 
 
 const AVG_CHAR_WIDTH = 10;
@@ -122,6 +122,14 @@ function calculateNodeWidth(text: string): number {
 
 async function createCanvasFromClipboard(plugin: Plugin) {
     const clipboardContent = await getClipboardText()
+
+    if (!isGdbBacktrace(clipboardContent)) {
+        new Notice(
+            "Clipboard does not contain a valid GDB backtrace."
+        );
+        return;
+    }
+
     const { nodes, edges } = parseTextToCanvas(clipboardContent);
 
     const canvasData = {
