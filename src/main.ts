@@ -15,6 +15,7 @@ import { createCanvasFromClipboard } from './commands/canvasFromDebug';
 import { formatIssueCheckout } from './commands/formatIssue';
 import { formatAsTodoList } from './commands/formatAsTodoList';
 import { formatAsPackages } from './commands/formatAsPackages';
+import { createMermaidFromClipboard } from './commands/mermaidFromDebug';
 
 export default class CurryPlugin extends Plugin {
 	settings!: MyPluginSettings;
@@ -180,6 +181,14 @@ export default class CurryPlugin extends Plugin {
 	}
 
 	private addCommands() {
+		this.addCommand({
+			id: 'mermaid-from-debug',
+			name: 'Mermaid from debug',
+			callback: async () => {
+				await createMermaidFromClipboard(this)
+			},
+		});
+
 		this.addCommand({
 			id: 'canvas-from-debug',
 			name: 'Canvas from debug',

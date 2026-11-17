@@ -8,5 +8,12 @@ async function getClipboardText(): Promise<string> {
     }
 }
 
+function isGdbBacktrace(text: string): boolean {
+    return text
+        .split('\n')
+        .some(line => /^#\d+\s/.test(line.trim()));
+}
 
-export { getClipboardText }
+
+
+export { getClipboardText, isGdbBacktrace }
