@@ -49,7 +49,7 @@ export async function formatAsTodoList(plugin: Plugin) {
         output += `- [ ] ${module}\n`;
 
         for (const file of files) {
-            output += `\t- [ ] ${file}\n`;
+            output += `\t- [ ] \`${file}\`\n`;
         }
 
         output += "\n";

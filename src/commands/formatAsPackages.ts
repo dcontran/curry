@@ -15,7 +15,9 @@ export async function formatAsPackages(editor: Editor) {
     const lines = selection.split("\n");
 
     for (const line of lines) {
-        const moduleMatch = line.match(/^- \[.\] (.+)$/);
+        const moduleMatch = line.match(
+            /^- \[[ x]\]\s+`([^`]+)`/
+        );
 
         if (moduleMatch && !line.startsWith("\t") && !line.startsWith(" ")) {
             if (packages.length > 0) {
@@ -26,10 +28,12 @@ export async function formatAsPackages(editor: Editor) {
             continue;
         }
 
-        const fileMatch = line.match(/^\s+- \[.\] (.+)$/);
+        const fileMatch = line.match(
+            /^\s+- \[[ x]\]\s+`([^`]+)`/
+        );
 
         if (fileMatch && currentModule) {
-            packages.push(`./${currentModule}/${fileMatch[1]}`);
+            packages.push(`./${currentModule.replaceAll("`", "")}/${fileMatch[1]?.replaceAll("`", "")}`);
         }
     }
 
