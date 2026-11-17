@@ -1,10 +1,8 @@
 import { Plugin, Notice } from "obsidian";
+import CurryPlugin from "../main";
 
 
-
-
-
-async function formatIssueCheckout(plugin: Plugin) {
+async function formatIssueCheckout(plugin: CurryPlugin) {
     const file = plugin.app.workspace.getActiveFile();
 
     if (!file) {
@@ -18,7 +16,7 @@ async function formatIssueCheckout(plugin: Plugin) {
 
 
 
-    const text = `[dcontreras] #${issueNumber} ${issueTitle}`;
+    const text = `[${plugin.settings.username}] #${issueNumber} ${issueTitle}`;
 
     await navigator.clipboard.writeText(text);
 
